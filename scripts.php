@@ -12,18 +12,29 @@ function CreateCSV($childFile, $parentFile)
 	$fp = fopen('final.csv', 'w');
 
 	$RowParent=1;
+	$TotalFieldCount=0;
 	if (($handle = fopen($parentFile, "r")) !== FALSE){
 		while (($ParentData[$RowParent] = fgetcsv($handle, 1000, ",")) !== FALSE){
 			$final = $ParentData[$RowParent];
-			 for($d=1;$d<$RowChild;$d++){
+			if($RowParent==1)
+				$TotalFieldCount = count($ChildData[1]) + count($ParentData[1]);
+			 for($d=1;$d<$RowChild;$d++)
+			 {
+				$num = count($ChildData[$d]);
 				if(strtoupper($ParentData[$RowParent][0]) == strtoupper($ChildData[$d][0])){
-					$num = count($ChildData[$d]);
-					for($p=1;$p<$num;$p++)
+					for($p=1;$p<$num;$p++){
 						array_push($final,$ChildData[$d][$p]);
+					}
 				}	
 			}
-			$RowParent++;
+			if(count($final)<$TotalFieldCount){
+				for($p=count($final);$p<$TotalFieldCount-1;$p++){
+					array_push($final,'');
+				}
+			}
+
 			fputcsv($fp, $final);
+			$RowParent++;
 		}
 		fclose($fp);
 		fclose($handle);
